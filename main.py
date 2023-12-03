@@ -15,7 +15,8 @@ def challenge(
 
 
     def challenge_runner():
-        print(f'day {day}, challenge {ch}: {func()}')
+        data : str = input_data(day)
+        print(f'day {day}, challenge {ch}: {func(data)}')
 
     challenges.append(challenge_runner)
 
@@ -26,7 +27,7 @@ def input_data(day : int) -> str:
 
 
 @challenge
-def challenge_1_1() -> int:
+def challenge_1_1(data : str) -> int:
     data : str = input_data(1)
 
     re_num : re.Pattern = re.compile(r'[0-9]')
@@ -41,9 +42,7 @@ def challenge_1_1() -> int:
 
 
 @challenge
-def challenge_1_2() -> int:
-    data : str = input_data(1)
-
+def challenge_1_2(data : str) -> int:
     digit_str : list[str] = [
         'zero',
         'one',
@@ -61,7 +60,7 @@ def challenge_1_2() -> int:
         return digit_str.index(value) if value in digit_str else int(value)
 
     re_num : re.Pattern = re.compile(
-        f'(?=([0-9]|{"|".join(digit_str)}))'
+        f'(?=([0-9]|{"|".join(digit_str)}))',
     )
     result : int = 0
 
@@ -69,6 +68,59 @@ def challenge_1_2() -> int:
         matches : list[any] = re_num.findall(line)
 
         result += as_int(matches[0]) * 10 + as_int(matches[-1])
+
+    return result
+
+
+@challenge
+def challenge_2_1(data : str) -> int:
+    target : dict[str, int] = {
+        'red': 12,
+        'green': 13,
+        'blue': 14,
+    }
+
+    re_rounds : re.Pattern = re.compile('( ([0-9]+) (.+?))(?:[,;]|$)')
+    result : int = 0
+
+    for line in data.split('\n'):
+        game, rounds = line.split(':')
+
+        for round in re_rounds.finditer(rounds):
+            _, count, color = round.groups()
+            if target[color] < int(count):
+                break
+        else:
+            result += int(game.split(' ')[1])
+
+    return result
+
+
+@challenge
+def challenge_2_2(data: str) -> int:
+    re_rounds : re.Pattern = re.compile('( ([0-9]+) (.+?))(?:[,;]|$)')
+    result : int = 0
+
+    for line in data.split('\n'):
+        _, rounds = line.split(':')
+
+        max_counts : dict[str, int] = {
+            'red': 0,
+            'green': 0,
+            'blue': 0,
+        }
+
+        for round in re_rounds.finditer(rounds):
+            _, count, color = round.groups()
+
+            max_counts[color] = max(max_counts[color], int(count))
+
+        value : int = 1
+
+        for count in max_counts.values():
+            value *= count
+
+        result += value
 
     return result
 
