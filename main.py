@@ -1,5 +1,6 @@
 import math
 import re
+import time
 
 count : int = 1
 challenges : list[callable] = []
@@ -16,7 +17,10 @@ def challenge(
 
     def challenge_runner():
         data : str = input_data(day)
-        print(f'day {day}, challenge {ch}: {func(data)}')
+
+        start, result, end = time.time(), func(data), time.time()
+
+        print(f'day {day}, challenge {ch} ({end - start:0.3f} ms): {result}')
 
     challenges.append(challenge_runner)
 
@@ -367,9 +371,57 @@ def challenge_5_2(data : str) -> int:
     return min(results)
 
 
+@challenge
+def challenge_6_1(data : str) -> int:
+    re_numbers : re.Pattern = re.compile('[0-9]+')
+
+    races : list[tuple[int, int]] = zip(
+        *[
+            tuple(map(int, re_numbers.findall(line)))
+            for line in data.split('\n')
+        ]
+    )
+
+    result : int = 1
+
+    for time, distance in races:
+        count : int = 0
+
+        for i in range(1, time):
+            if i * (time - i) > distance:
+                count += 1
+
+        result *= count
+
+    return result
+
+@challenge
+def challenge_6_2(data : str) -> int:
+    re_numbers : re.Pattern = re.compile('[0-9]+')
+
+    races : list[tuple[int, int]] = zip(
+        *[
+            [int("".join(re_numbers.findall(line)))]
+            for line in data.split('\n')
+        ]
+    )
+
+    result : int = 1
+
+    for time, distance in races:
+        count : int = 0
+
+        for i in range(1, time):
+            if i * (time - i) > distance:
+                count += 1
+
+        result *= count
+
+    return result
+
 
 def main() -> None:
-    runner(5)
+    runner(6)
 
 
 if __name__ == '__main__':
