@@ -2,6 +2,7 @@
 import collections
 import functools
 import math
+import queue
 import re
 import time
 
@@ -667,14 +668,29 @@ class Vector():
     def y_set(self, value):
         self.y = value
 
+    def neighbours(self) -> tuple:
+        return tuple(self + n for n in [U, D, L, R])
+
+    def inside(self, bounds : tuple) -> bool:
+        return (
+            bounds[0].x <= self.x < bounds[1].x and
+            bounds[0].y <= self.y < bounds[1].y
+        )
+
     def __add__(self, other):
         return Vector(self.x + other.x, self.y + other.y)
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
 
+    def __lt__(self, other):
+        return self.x < other.x and self.y < other.y
+
     def __hash__(self):
         return hash((self.x, self.y))
+
+    def __mul__(self, scalar):
+        return Vector(self.x * scalar, self.y * scalar)
 
     def __neg__(self):
         return Vector(-self.x, -self.y)
@@ -1146,8 +1162,69 @@ def challenge_16_2(data : str) -> int:
     return result
 
 
+def __challenge_17_process(
+    data : str,
+    distance_min : int,
+    distance_max : int,
+) -> int:
+    grid : list[list[int]] = [
+        [int(cell) for cell in line]
+        for line in data.split('\n')
+    ]
+
+    width, height = len(grid[0]), len(grid)
+    directions, bounds = {U, D, L, R}, (Z, Vector(width, height))
+
+    start, end = Z, Vector(width - 1, height - 1)
+
+    seen, todo = set(), queue.PriorityQueue()
+    todo.put((0, start, Z, 0))
+
+    while todo:
+        cost, position, direction, distance = todo.get()
+
+        if position == end and distance >= distance_min:
+            return cost
+
+        seen_key = (position, direction, distance)
+
+        if seen_key in seen:
+            continue
+
+        seen.add(seen_key)
+
+        for ndirection in directions - {direction, -direction}:
+            travel_cost = 0
+
+            for ndistance in range(distance_min, distance_max + 1):
+                nposition = position + ndirection * ndistance
+
+                if not nposition.inside(bounds):
+                    continue
+
+                travel_cost += grid[nposition.y][nposition.x]
+                ncost = cost + travel_cost
+
+                todo.put((ncost, nposition, ndirection, ndistance))
+
+    return math.inf
+
+
+@challenge
+def challenge_17_1(data : str) -> int:
+    return __challenge_17_process(data, 1, 3)
+
+
+@challenge
+def challenge_17_2(data : str) -> int:
+    return __challenge_17_process(data, 4, 10)
+
+
 def main() -> None:
-    runner(16)
+    try:
+        runner(17)
+    except KeyboardInterrupt:
+        print('\rexiting...')
 
 
 if __name__ == '__main__':
