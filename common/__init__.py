@@ -1,4 +1,5 @@
 import collections
+from copy import copy
 import functools
 import math
 import re
