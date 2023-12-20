@@ -102,3 +102,13 @@ L = Vector(-1, 0)
 R = Vector(1, 0)
 Z = Vector(0, 0)
 I = Vector(100, 100)
+
+
+
+def gcd(a : int, b : int) -> int:
+    while b:
+        a, b = b, a % b
+    return a
+
+def lcm(a : int, b : int) -> int:
+    return a * b // gcd(a, b)

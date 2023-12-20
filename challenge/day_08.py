@@ -62,17 +62,9 @@ def challenge_8_2(data : str) -> int:
 
         return length
 
-    def __gcd(a : int, b : int) -> int:
-        while b:
-            a, b = b, a % b
-        return a
-
-    def __lcm(a : int, b : int) -> int:
-        return a * b // __gcd(a, b)
-
     lengths : list[int] = [
         __length(location)
         for location in map.keys() if location[-1] == 'A'
     ]
 
-    return functools.reduce(__lcm, lengths)
+    return functools.reduce(lcm, lengths)

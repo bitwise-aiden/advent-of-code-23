@@ -17,3 +17,4 @@ from . import day_16
 from . import day_17
 from . import day_18
 from . import day_19
+from . import day_20
