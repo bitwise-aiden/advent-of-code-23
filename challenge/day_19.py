@@ -1,132 +1,97 @@
 from common import *
 
 
-class XMAS:
-    def __init__(self, x = None, m  = None, a  = None, s  = None):
-        self.x = x
-        self.m = m
-        self.a = a
-        self.s = s
+def __workflows(data : str) -> dict[str, (str, callable, int, str)]:
+    workflows : dict[str, list[(str, callable, int, str)]] = {}
 
-
-    def __copy__(self):
-        return XMAS(self.x, self.m, self.a, self.s)
-
-
-    def __iter__(self):
-        return iter((self.x, self.m, self.a, self.s))
-
-
-    def __lshift__(self, other):
-        if other.x: self.x = other.x
-        if other.m: self.m = other.m
-        if other.a: self.a = other.a
-        if other.s: self.s = other.s
-
-        return self
-
-
-def __workflows_1(data : str) -> dict[str, callable]:
-    re_rule : re.Pattern = re.compile('([a-z])(\<|\>)([0-9]+):([a-zA-Z]+)')
-
-    workflows : dict[str, callable] = {
-        'R': lambda _1, _2: False,
-        'A': lambda xmas, _: True
-    }
+    re_rule : re.Pattern = re.compile('([a-z])([\>\<])([0-9]+):([a-zA-Z]+)')
 
     for line in data.split('\n'):
-        name, rules = line.split('{')
-        rules = rules.split(',')
+        name, rules = line[:-1].split('{')
+        *rules, fallback = rules.split(',')
 
-        rule_str : str = f'lambda xmas, rules: '
+        workflows[name] = []
 
-        for rule in rules[:-1]:
-            var, op, cond, res = re_rule.match(rule).groups()
+        for rule in rules:
+            var, op, comp, fn = re_rule.match(rule).groups()
 
-            rule_str += f' (rules["{res}"](xmas, rules) if xmas.{var} {op} {cond} else '
+            workflows[name].append((
+                var,
+                int.__lt__ if op == '<' else int.__gt__,
+                int(comp),
+                fn,
+            ))
 
-        rule_str += f' rules["{rules[-1][:-1]}"](xmas, rules)){")" * (len(rules) - 2)}'
-
-        workflows[name] = eval(rule_str)
+        workflows[name].append((None, None, None, fallback))
 
     return workflows
 
 
-def __workflows_2(data : str) -> dict[str, callable]:
-    re_rule : re.Pattern = re.compile('([a-z])(\<|\>)([0-9]+):([a-zA-Z]+)')
-
-    workflows : dict[str, callable] = {
-        'R': lambda _1, _2: 0,
-        'A': lambda xmas, _: math.prod(b - a + 1 for a, b in xmas)
-    }
-
-    for line in data.split('\n'):
-        name, rules = line.split('{')
-        rules = rules.split(',')
-
-        rule_str : str = f'lambda xmas, rules: sum(['
-
-        operations = {
-            '>': lambda v, c: (f'{c} + 1', f'xmas.{v}[1]', f'xmas.{v}[0]', f'{c}'),
-            '<': lambda v, c: (f'xmas.{v}[0]', f'{c} - 1', f'{c}', f'xmas.{v}[1]'),
-        }
-
-        carry_over = []
-
-        for rule in rules[:-1]:
-            var, op, cond, res = re_rule.match(rule).groups()
-
-            a, b, *remainder = operations[op](var, cond)
-
-            carry = " << ".join(f'XMAS({v}=({ra, rb}))' for v, ra, rb in carry_over) or 'XMAS()'
-            check = f'if {carry_over[-1][1]} <= {carry_over[-1][2]} else 0' if carry_over else ''
-            rule_str += f'rules["{res}"](copy(xmas) << XMAS({var}=({a}, {b})) << {carry}, rules) {check},'
-
-            carry_over.append((var, *remainder))
-
-        carry = " << ".join(f'XMAS({v}=({ra, rb}))' for v, ra, rb in carry_over)
-        check = f'if {carry_over[-1][1]} <= {carry_over[-1][2]} else 0' if carry_over else ''
-        rule_str += f'rules["{rules[-1][:-1]}"](copy(xmas) << {carry or "XMAS()"}, rules) {check}])'
-
-        print(rule_str)
-
-        workflows[name] = eval(rule_str.replace('\'', ''))
-        # 300319813012433
-
-    return workflows
+def __parts(data : str) -> list[dict[str, int]]:
+    return [
+        eval(f'dict({line[1:-1]})')
+        for line in data.split('\n')
+    ]
 
 
+def __check(part, workflows, current):
+    if current == 'R': return False
+    if current == 'A': return True
 
-def __parts(data : str) -> list[XMAS]:
-    parts : list[XMAS] = []
+    *rules, fallback = workflows[current]
 
-    for line in data.split('\n'):
-        parts.append(eval(f'XMAS({line[1:-1]})'))
+    for var, op, comp, fn in rules:
+        if op(part[var], comp):
+            return __check(part, workflows, fn)
 
-    return parts
+    return __check(part, workflows, fallback[-1])
+
+
+def __permutations(part, workflows, current):
+    if current == 'R': return 0
+    if current == 'A': return math.prod(b - a + 1 for a, b in part.values())
+
+    *rules, fallback = workflows[current]
+    count, remainder = 0, dict(part)
+
+    for var, op, cmp, fn in rules:
+        a, b = ra, rb = remainder[var]
+
+        if op == int.__lt__:
+            b, ra = cmp - 1, cmp
+        else:
+            a, rb = cmp + 1, cmp
+
+        if a <= b:
+            count += __permutations({**remainder, var: (a, b)}, workflows, fn)
+
+        if ra > rb:
+            break
+
+        remainder[var] = (ra, rb)
+    else:
+        count += __permutations(remainder, workflows, fallback[-1])
+
+    return count
 
 
 @challenge
 def challenge_19_1(data : str) -> int:
-    workflows, parts = data.split('\n\n')
-    workflows, parts = __workflows_1(workflows), __parts(parts)
+    result : int = 0
 
-    return sum(
-        sum(part)
-        for part in parts
-        if workflows['in'](part, workflows)
-    )
+    workflows, parts = data.split('\n\n')
+    workflows, parts = __workflows(workflows), __parts(parts)
+
+    for part in parts:
+        if __check(part, workflows, 'in'):
+            result += sum(part.values())
+
+    return result
 
 
 @challenge
 def challenge_19_2(data : str) -> int:
-    result : int = 0
-
     workflows, _ = data.split('\n\n')
-    workflows = __workflows_2(workflows)
+    workflows = __workflows(workflows)
 
-    xmas = XMAS((1, 4000), (1, 4000), (1, 4000), (1, 4000))
-
-    result = workflows['in'](xmas, workflows)
-
-    return result
+    return __permutations({k: (1, 4000) for k in 'xmas'}, workflows, 'in')
