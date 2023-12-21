@@ -31,7 +31,7 @@ def challenge(
 
 def input_data(day : int) -> str:
     with open(f'./data/day_{day:02d}_input', 'r') as in_file:
-        return in_file.read().strip()
+        return in_file.read().split('$---$')[0].strip()
 
 
 def runner(day : int = -1) -> None:
@@ -85,6 +85,9 @@ class Vector():
         return hash((self.x, self.y))
 
     def __mul__(self, scalar):
+        if isinstance(scalar, Vector):
+            return Vector(self.x * scalar.x, self.y * scalar.y)
+
         return Vector(self.x * scalar, self.y * scalar)
 
     def __neg__(self):
@@ -112,3 +115,13 @@ def gcd(a : int, b : int) -> int:
 
 def lcm(a : int, b : int) -> int:
     return a * b // gcd(a, b)
+
+
+def sign(value : int) -> int:
+    if value < 0:
+        return -1
+
+    if value > 0:
+        return 1
+
+    return 0
