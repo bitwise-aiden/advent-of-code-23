@@ -47,9 +47,9 @@ def runner(day : int = -1) -> None:
 
 
 class Vector():
-    def __init__(self, x, y):
+    def __init__(self, x, y = None):
         self.x = x
-        self.y = y
+        self.y = y if y != None else x
 
     def x_get(self):
         return self.x
