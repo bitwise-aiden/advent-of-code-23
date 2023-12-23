@@ -65,13 +65,13 @@ def challenge_16_2(data : str) -> int:
     width = len(grid[0])
 
     for y in range(height):
-        l, r = Vector(0, y), Vector(width - 1, y)
+        l, r = Vector2(0, y), Vector2(width - 1, y)
 
         result = max(result, __challenge_16_filled(grid, l, R))
         result = max(result, __challenge_16_filled(grid, r, L))
 
     for x in range(width):
-        t, b = Vector(x, 0), Vector(x, height - 1)
+        t, b = Vector2(x, 0), Vector2(x, height - 1)
 
         result = max(result, __challenge_16_filled(grid, t, D))
         result = max(result, __challenge_16_filled(grid, b, U))

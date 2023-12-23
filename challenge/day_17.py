@@ -12,9 +12,9 @@ def __challenge_17_process(
     ]
 
     width, height = len(grid[0]), len(grid)
-    directions, bounds = {U, D, L, R}, (Z, Vector(width, height))
+    directions, bounds = {U, D, L, R}, (Z, Vector2(width, height))
 
-    start, end = Z, Vector(width - 1, height - 1)
+    start, end = Z, Vector2(width - 1, height - 1)
 
     seen, todo = set(), queue.PriorityQueue()
     todo.put((0, start, Z, 0))

@@ -16,7 +16,7 @@ def __challenge_11_calculate(data : str, scale : int) -> int:
             if lines[y][x] == '#':
                 break
         else:
-            voids.append(Vector(0, y))
+            voids.append(Vector2(0, y))
 
     # Find horizontal voids
     for x in range(width):
@@ -24,7 +24,7 @@ def __challenge_11_calculate(data : str, scale : int) -> int:
             if lines[y][x] == '#':
                 break
         else:
-            voids.append(Vector(x, 0))
+            voids.append(Vector2(x, 0))
 
     scale -= 1
     # Find galaxies and expand for voids
@@ -35,7 +35,7 @@ def __challenge_11_calculate(data : str, scale : int) -> int:
                 y_expand = len([*filter(lambda v: 0 < v.y < y, voids)])
 
                 galaxies.append(
-                    Vector(x + x_expand * scale, y + y_expand * scale)
+                    Vector2(x + x_expand * scale, y + y_expand * scale)
                 )
 
     result = 0

@@ -3,27 +3,27 @@ from common import *
 
 @challenge
 def challenge_21_1(data : str) -> int:
-    start : Vector
-    rocks : set[Vector] = set()
+    start : Vector2
+    rocks : set[Vector2] = set()
 
     for y, line in enumerate(data.split('\n')):
         for x, char in enumerate(line):
             match char:
                 case 'S':
-                    start = Vector(x, y)
+                    start = Vector2(x, y)
                 case '#':
-                    rocks.add(Vector(x, y))
+                    rocks.add(Vector2(x, y))
 
     width, height = x + 1, y + 1
-    bounds : tuple[Vector] = (Z, Vector(width, height))
-    current : set[Vector] = {start}
+    bounds : tuple[Vector2] = (Z, Vector2(width, height))
+    current : set[Vector2] = {start}
 
     for _ in range(64):
-        next : set[Vector] = set()
+        next : set[Vector2] = set()
 
         for location in current:
             for offset in [U, D, L, R]:
-                location_step : Vector = location + offset
+                location_step : Vector2 = location + offset
 
                 if location_step in rocks:
                     continue
@@ -332,7 +332,7 @@ def challenge_21_2(data : str) -> int:
 
     plot = data.split('\n')
 
-    start, bounds = Vector(plot_size // 2), (Z, Vector(plot_size))
+    start, bounds = Vector2(plot_size // 2), (Z, Vector2(plot_size))
     todo, visited = [(start, 0)], {}
 
     while todo:

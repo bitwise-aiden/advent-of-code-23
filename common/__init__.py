@@ -46,7 +46,7 @@ def runner(day : int = -1) -> None:
         challenge()
 
 
-class Vector():
+class Vector2():
     def __init__(self, x, y = None):
         self.x = x
         self.y = y if y != None else x
@@ -73,7 +73,7 @@ class Vector():
         )
 
     def __add__(self, other):
-        return Vector(self.x + other.x, self.y + other.y)
+        return Vector2(self.x + other.x, self.y + other.y)
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
@@ -84,28 +84,115 @@ class Vector():
     def __hash__(self):
         return hash((self.x, self.y))
 
-    def __mul__(self, scalar):
-        if isinstance(scalar, Vector):
-            return Vector(self.x * scalar.x, self.y * scalar.y)
+    def __len__(self):
+        return math.sqrt(self.x ** 2 + self.y ** 2)
 
-        return Vector(self.x * scalar, self.y * scalar)
+    def __mul__(self, scalar):
+        if isinstance(scalar, Vector2):
+            return Vector2(self.x * scalar.x, self.y * scalar.y)
+
+        return Vector2(self.x * scalar, self.y * scalar)
 
     def __neg__(self):
-        return Vector(-self.x, -self.y)
+        return Vector2(-self.x, -self.y)
 
     def __sub__(self, other):
-        return Vector(self.x - other.x, self.y - other.y)
+        return Vector2(self.x - other.x, self.y - other.y)
 
     def __str__(self):
         return f'({self.x}, {self.y})'
 
-U = Vector(0, -1)
-D = Vector(0, 1)
-L = Vector(-1, 0)
-R = Vector(1, 0)
-Z = Vector(0, 0)
-I = Vector(100, 100)
+    def __repr__(self):
+        return f'({self.x}, {self.y})'
 
+
+U = Vector2(0, -1)
+D = Vector2(0, 1)
+L = Vector2(-1, 0)
+R = Vector2(1, 0)
+Z = Vector2(0, 0)
+I = Vector2(100, 100)
+
+class Vector3(Vector2):
+    def __init__(self, x, y = None, z = None):
+        self.x = x
+        self.y = y if y != None else x
+        self.z = z if z != None else x
+
+    def z_get(self):
+        return self.z
+
+    def z_set(self, value):
+        self.z = value
+
+    def neighbours(self) -> tuple:
+        ns = []
+
+        for n in super():
+            for i in range(-1, 2):
+                ns.append(Vector3(n.x, n.y, i))
+
+        return ns
+
+    def inside(self, bounds : tuple) -> bool:
+        return (
+            super() and
+            bounds[0].z <= self.z < bounds[1].z
+        )
+
+    def to_vector2(self) -> Vector2:
+        return Vector2(self.x, self.y)
+
+    def __add__(self, other):
+        return Vector3(self.x + other.x, self.y + other.y, self.z + other.z)
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y and self.z == other.z
+
+    def __lt__(self, other):
+        return self.x <= other.x and self.y <= other.y and self.z <= other.z
+
+    def __hash__(self):
+        return hash((self.x, self.y, self.z))
+
+    def __len__(self):
+        return int(math.sqrt(self.x ** 2 + self.y ** 2 + self.z ** 2))
+
+    def __mul__(self, scalar):
+        if isinstance(scalar, Vector3):
+            return Vector3(
+                self.x * scalar.x,
+                self.y * scalar.y,
+                self.z * scalar.z,
+            )
+
+        return Vector3(self.x * scalar, self.y * scalar, self.z * scalar)
+
+    def __neg__(self):
+        return Vector3(-self.x, -self.y, -self.z)
+
+    def __sub__(self, other):
+        return Vector3(self.x - other.x, self.y - other.y, self.z - other.z)
+
+    def __div__(self, other):
+        return Vector3(self.x // other, self.y // other, self.z // other)
+
+    def __truediv__(self, other):
+        return Vector3(self.x // other, self.y // other, self.z // other)
+
+    def __str__(self):
+        return f'({self.x}, {self.y}, {self.z})'
+
+    def __repr__(self) -> str:
+        return f'({self.x}, {self.y}, {self.z})'
+
+U3 = Vector3(0, -1, 0)
+D3 = Vector3(0, 1, 0)
+L3 = Vector3(-1, 0, 0)
+R3 = Vector3(1, 0, 0)
+F3 = Vector3(0, 0, 1)
+B3 = Vector3(0, 0, -1)
+Z3 = Vector3(0, 0, 0)
 
 
 def gcd(a : int, b : int) -> int:

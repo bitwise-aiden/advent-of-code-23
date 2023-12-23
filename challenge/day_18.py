@@ -1,7 +1,7 @@
 from common import *
 
 
-def __challenge_18_shoelace(points : list[Vector]) -> int:
+def __challenge_18_shoelace(points : list[Vector2]) -> int:
     x = [v.x for v in points]
     y = [v.y for v in points]
 
@@ -14,7 +14,7 @@ def __challenge_18_shoelace(points : list[Vector]) -> int:
 def __challenge_18_data(data : str, processor) -> int:
     re_data : re.Pattern = re.compile('([A-Z]) ([0-9]+) \(#(.*?)\)')
 
-    polygon : list[Vector] = [Z]
+    polygon : list[Vector2] = [Z]
     dist = 0
 
     for line in data.split('\n'):

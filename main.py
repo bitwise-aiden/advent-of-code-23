@@ -4,7 +4,7 @@ from common import *
 
 def main() -> None:
     try:
-        runner(21)
+        runner(22)
     except KeyboardInterrupt:
         print('\rexiting...')
 
