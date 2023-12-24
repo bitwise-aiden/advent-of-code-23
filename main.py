@@ -1,10 +1,10 @@
 from challenge import *
-from common import *
+from common import runner
 
 
 def main() -> None:
     try:
-        runner(23)
+        runner(24)
     except KeyboardInterrupt:
         print('\rexiting...')
 

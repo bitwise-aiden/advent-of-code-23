@@ -83,7 +83,7 @@ def __bricks(data : str) -> list[Brick]:
         possible_supports : list[(int, Brick)] = []
 
         for point in brick:
-            p2 = point.to_vector2()
+            p2 = point.to_v2()
             if p2 in fallen_bricks:
                 max_height = max(fallen_bricks[p2].keys())
                 possible_supports.append((
@@ -103,7 +103,7 @@ def __bricks(data : str) -> list[Brick]:
             brick.update_height(1)
 
         for point in brick:
-            p2 = point.to_vector2()
+            p2 = point.to_v2()
             fallen_bricks[p2] = fallen_bricks.get(p2, {})
             fallen_bricks[p2][point.z] = brick
 

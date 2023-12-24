@@ -47,9 +47,10 @@ def runner(day : int = -1) -> None:
 
 
 class Vector2():
-    def __init__(self, x, y = None):
-        self.x = x
-        self.y = y
+    def __init__(self, x, y = None, _type=int):
+        self.x = _type(x)
+        self.y = _type(y if y != None else x)
+        self._type = _type
 
     def x_get(self):
         return self.x
@@ -63,6 +64,9 @@ class Vector2():
     def y_set(self, value):
         self.y = value
 
+    def cross(self, other):
+        return self.x * other.y - self.y * other.x
+
     def neighbours(self) -> tuple:
         return tuple(self + n for n in [U, D, L, R])
 
@@ -73,7 +77,7 @@ class Vector2():
         )
 
     def __add__(self, other):
-        return Vector2(self.x + other.x, self.y + other.y)
+        return Vector2(self.x + other.x, self.y + other.y, self._type)
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
@@ -89,15 +93,15 @@ class Vector2():
 
     def __mul__(self, scalar):
         if isinstance(scalar, Vector2):
-            return Vector2(self.x * scalar.x, self.y * scalar.y)
+            return Vector2(self.x * scalar.x, self.y * scalar.y, self._type)
 
-        return Vector2(self.x * scalar, self.y * scalar)
+        return Vector2(self.x * scalar, self.y * scalar, self._type)
 
     def __neg__(self):
-        return Vector2(-self.x, -self.y)
+        return Vector2(-self.x, -self.y, self._type)
 
     def __sub__(self, other):
-        return Vector2(self.x - other.x, self.y - other.y)
+        return Vector2(self.x - other.x, self.y - other.y, self._type)
 
     def __str__(self):
         return f'({self.x}, {self.y})'
@@ -114,10 +118,11 @@ Z = Vector2(0, 0)
 I = Vector2(100, 100)
 
 class Vector3(Vector2):
-    def __init__(self, x, y = None, z = None):
-        self.x = x
-        self.y = y if y != None else x
-        self.z = z if z != None else x
+    def __init__(self, x, y = None, z = None, _type=int):
+        self.x = _type(x)
+        self.y = _type(y if y != None else x)
+        self.z = _type(z if z != None else x)
+        self._type = _type
 
     def z_get(self):
         return self.z
@@ -125,12 +130,20 @@ class Vector3(Vector2):
     def z_set(self, value):
         self.z = value
 
+    def cross(self, other):
+        return Vector3(
+            self.y * other.z - self.z * other.y,
+            self.z * other.x - self.x * other.z,
+            self.x * other.y - self.y * other.x,
+            self._type
+        )
+
     def neighbours(self) -> tuple:
         ns = []
 
         for n in super():
             for i in range(-1, 2):
-                ns.append(Vector3(n.x, n.y, i))
+                ns.append(Vector3(n.x, n.y, i, self._type))
 
         return ns
 
@@ -140,11 +153,11 @@ class Vector3(Vector2):
             bounds[0].z <= self.z < bounds[1].z
         )
 
-    def to_vector2(self) -> Vector2:
-        return Vector2(self.x, self.y)
+    def to_v2(self) -> Vector2:
+        return Vector2(self.x, self.y, self._type)
 
     def __add__(self, other):
-        return Vector3(self.x + other.x, self.y + other.y, self.z + other.z)
+        return Vector3(self.x + other.x, self.y + other.y, self.z + other.z, self._type)
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y and self.z == other.z
@@ -164,21 +177,22 @@ class Vector3(Vector2):
                 self.x * scalar.x,
                 self.y * scalar.y,
                 self.z * scalar.z,
+                self._type
             )
 
-        return Vector3(self.x * scalar, self.y * scalar, self.z * scalar)
+        return Vector3(self.x * scalar, self.y * scalar, self.z * scalar, self._type)
 
     def __neg__(self):
-        return Vector3(-self.x, -self.y, -self.z)
+        return Vector3(-self.x, -self.y, -self.z, self._type)
 
     def __sub__(self, other):
-        return Vector3(self.x - other.x, self.y - other.y, self.z - other.z)
+        return Vector3(self.x - other.x, self.y - other.y, self.z - other.z, self._type)
 
     def __div__(self, other):
-        return Vector3(self.x // other, self.y // other, self.z // other)
+        return Vector3(self.x // other, self.y // other, self.z // other, self._type)
 
     def __truediv__(self, other):
-        return Vector3(self.x // other, self.y // other, self.z // other)
+        return Vector3(self.x // other, self.y // other, self.z // other, self._type)
 
     def __str__(self):
         return f'({self.x}, {self.y}, {self.z})'
