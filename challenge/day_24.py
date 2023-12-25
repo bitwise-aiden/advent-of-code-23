@@ -1,4 +1,5 @@
 from common import *
+import sympy
 
 
 def __lines(data : str) -> list[(Vector3, Vector3)]:
@@ -49,8 +50,15 @@ def challenge_24_1(data : str) -> int:
 
 @challenge
 def challenge_24_2(data : str) -> int:
-    # I have intentionally not solved today's p2 because this is quite
-    # far outside the realm of my expertise and having a 3 month old,
-    # not how I want to be spending my Christmas Eve. I am foregoing
-    # this one star, but doing so for family <3
-    return
+    lines = __lines(data)
+
+    px, py, pz, vx, vy, vz = sympy.symbols('px, py, pz, vx, vy, vz')
+
+    equations = []
+
+    for p, v in lines:
+        equations.append((px - p.x) * (v.y - vy) - (py - p.y) * (v.x - vx))
+        equations.append((py - p.y) * (v.z - vz) - (pz - p.z) * (v.y - vy))
+
+    answer = sympy.solve(equations)[0]
+    return answer[px] + answer[py] + answer[pz]
