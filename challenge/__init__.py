@@ -22,3 +22,4 @@ from . import day_21
 from . import day_22
 from . import day_23
 from . import day_24
+from . import day_25
